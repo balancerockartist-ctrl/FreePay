@@ -29,7 +29,7 @@ const AVATAR_COLORS = [
 function avatarColor(name) {
   let hash = 0;
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[hash];
+  return AVATAR_COLORS[Math.abs(hash)];
 }
 
 export default function Contacts() {
