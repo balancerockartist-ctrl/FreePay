@@ -3,10 +3,10 @@ from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from cryptography.fernet import Fernet
 import os
 import logging
 import secrets
-import json
 import httpx
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
@@ -23,11 +23,43 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Fernet encryption for provider API keys stored in DB.
+# Set FREEPAY_ENCRYPTION_KEY to a stable Fernet key (generate once with
+# Fernet.generate_key().decode()). If absent a random key is used – which
+# means provider keys become unreadable after a restart, so set it in .env!
+_raw_enc_key = os.environ.get("FREEPAY_ENCRYPTION_KEY")
+if _raw_enc_key:
+    _fernet = Fernet(_raw_enc_key.encode())
+else:
+    logging.warning(
+        "FREEPAY_ENCRYPTION_KEY not set – using a temporary key. "
+        "Provider API keys will be unreadable after restart."
+    )
+    _fernet = Fernet(Fernet.generate_key())
+
+
+def _encrypt(value: str) -> str:
+    return _fernet.encrypt(value.encode()).decode()
+
+
+def _decrypt(value: str) -> str:
+    return _fernet.decrypt(value.encode()).decode()
+
+
+# Shared async HTTP client (reused across requests for connection pooling)
+_http_client = httpx.AsyncClient(timeout=120)
+
 # Create the main app without a prefix
 app = FastAPI(title="FreePay – Universal AI API Gateway")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Models
@@ -100,11 +132,11 @@ PROVIDER_PREFIXES: Dict[str, str] = {
 }
 
 
-def _detect_provider(model: str) -> str:
+def _detect_provider(model: str) -> Optional[str]:
     for prefix, provider in PROVIDER_PREFIXES.items():
         if model.startswith(prefix):
             return provider
-    return "openai"  # sensible default
+    return None
 
 
 def _public_key(doc: dict) -> ApiKeyPublic:
@@ -132,16 +164,19 @@ async def _call_openai(body: dict, api_key: str, raw_request: Request) -> Any:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
-    async with httpx.AsyncClient(timeout=120) as hx:
-        if body.get("stream"):
-            async def _stream():
-                async with hx.stream("POST", url, json=body, headers=headers) as r:
+    if body.get("stream"):
+        async def _stream():
+            try:
+                async with _http_client.stream("POST", url, json=body, headers=headers) as r:
                     async for chunk in r.aiter_bytes():
                         yield chunk
-            return StreamingResponse(_stream(), media_type="text/event-stream")
-        resp = await hx.post(url, json=body, headers=headers)
-        resp.raise_for_status()
-        return resp.json()
+            except Exception as exc:
+                logger.error("OpenAI streaming error: %s", exc)
+                yield b"data: [DONE]\n\n"
+        return StreamingResponse(_stream(), media_type="text/event-stream")
+    resp = await _http_client.post(url, json=body, headers=headers)
+    resp.raise_for_status()
+    return resp.json()
 
 
 async def _call_anthropic(body: dict, api_key: str, raw_request: Request) -> Any:
@@ -173,19 +208,21 @@ async def _call_anthropic(body: dict, api_key: str, raw_request: Request) -> Any
     if body.get("stream"):
         anthropic_body["stream"] = True
         url = "https://api.anthropic.com/v1/messages"
-        async with httpx.AsyncClient(timeout=120) as hx:
-            async def _stream():
-                async with hx.stream("POST", url, json=anthropic_body, headers=headers) as r:
+        async def _stream():
+            try:
+                async with _http_client.stream("POST", url, json=anthropic_body, headers=headers) as r:
                     async for chunk in r.aiter_bytes():
                         yield chunk
-            return StreamingResponse(_stream(), media_type="text/event-stream")
+            except Exception as exc:
+                logger.error("Anthropic streaming error: %s", exc)
+                yield b"data: [DONE]\n\n"
+        return StreamingResponse(_stream(), media_type="text/event-stream")
 
-    async with httpx.AsyncClient(timeout=120) as hx:
-        resp = await hx.post(
-            "https://api.anthropic.com/v1/messages", json=anthropic_body, headers=headers
-        )
-        resp.raise_for_status()
-        data = resp.json()
+    resp = await _http_client.post(
+        "https://api.anthropic.com/v1/messages", json=anthropic_body, headers=headers
+    )
+    resp.raise_for_status()
+    data = resp.json()
 
     # --- translate response to OpenAI format ---
     content = data.get("content", [{}])[0].get("text", "")
@@ -229,10 +266,9 @@ async def _call_google(body: dict, api_key: str, raw_request: Request) -> Any:
     if system_instruction:
         google_body["system_instruction"] = system_instruction
 
-    async with httpx.AsyncClient(timeout=120) as hx:
-        resp = await hx.post(url, json=google_body)
-        resp.raise_for_status()
-        data = resp.json()
+    resp = await _http_client.post(url, json=google_body)
+    resp.raise_for_status()
+    data = resp.json()
 
     candidate = data.get("candidates", [{}])[0]
     content = candidate.get("content", {}).get("parts", [{}])[0].get("text", "")
@@ -334,10 +370,9 @@ async def delete_api_key(key_id: str):
 
 @api_router.put("/keys/{key_id}/providers")
 async def update_provider_keys(key_id: str, body: ProviderKeysUpdate):
-    """Store the provider API keys associated with a FreePay key.
+    """Store the provider API keys associated with a FreePay key (encrypted at rest).
 
-    Only non-null values are updated.  Provider keys are stored as-is;
-    production deployments should encrypt them using the cryptography package.
+    Only non-null values are updated.
     """
     doc = await db.api_keys.find_one({"id": key_id}, {"_id": 0})
     if not doc:
@@ -348,7 +383,8 @@ async def update_provider_keys(key_id: str, body: ProviderKeysUpdate):
         raise HTTPException(status_code=400, detail="No provider keys provided")
 
     existing = doc.get("provider_keys", {})
-    existing.update(updates)
+    for provider_name, raw_key in updates.items():
+        existing[provider_name] = _encrypt(raw_key)
     await db.api_keys.update_one({"id": key_id}, {"$set": {"provider_keys": existing}})
     return {"message": "Provider keys updated", "configured_providers": list(existing.keys())}
 
@@ -387,14 +423,28 @@ async def universal_proxy(request: Request):
     model = body.get("model", "gpt-4o")
     provider = _detect_provider(model)
 
+    if provider is None:
+        supported = sorted(set(PROVIDER_PREFIXES.values()))
+        raise HTTPException(
+            status_code=400,
+            detail=f"Model '{model}' could not be mapped to a provider. "
+                   f"Supported providers: {supported}. "
+                   f"Model must start with one of: {list(PROVIDER_PREFIXES.keys())}",
+        )
+
     provider_keys = key_doc.get("provider_keys", {})
-    provider_api_key = provider_keys.get(provider)
-    if not provider_api_key:
+    encrypted_provider_key = provider_keys.get(provider)
+    if not encrypted_provider_key:
         raise HTTPException(
             status_code=400,
             detail=f"No {provider} API key configured for this FreePay key. "
                    f"Add it via PUT /api/keys/{{key_id}}/providers",
         )
+
+    try:
+        provider_api_key = _decrypt(encrypted_provider_key)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to decrypt provider key")
 
     caller = PROVIDER_CALLERS.get(provider)
     if not caller:
@@ -423,13 +473,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+    await _http_client.aclose()

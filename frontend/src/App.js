@@ -21,7 +21,9 @@ const API = `${BACKEND_URL}/api`;
 // ---------------------------------------------------------------------------
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => toast.success("Copied to clipboard"));
+  navigator.clipboard.writeText(text)
+    .then(() => toast.success("Copied to clipboard"))
+    .catch(() => toast.error("Could not copy – please copy manually"));
 }
 
 // ---------------------------------------------------------------------------
