@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -26,7 +26,10 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 
-# Define Models
+# ---------------------------------------------------------------------------
+# Models
+# ---------------------------------------------------------------------------
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
     
@@ -37,7 +40,46 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# Add your routes to the router instead of directly to app
+class PaymentInitiate(BaseModel):
+    amount: float
+    currency: str = "USD"
+    is_member: bool = False
+    payer_name: str = "Anonymous"
+    payer_email: Optional[str] = None
+    merchant_name: str = "FreePay Checkout"
+
+class PaymentSession(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    amount: float
+    currency: str
+    is_member: bool
+    payer_name: str
+    payer_email: Optional[str]
+    merchant_name: str
+    status: str = "pending"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DeviceRegister(BaseModel):
+    device_id: str
+    nickname: str = "My Device"
+    user_agent: Optional[str] = None
+
+class DeviceRecord(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    device_id: str
+    nickname: str
+    user_agent: Optional[str]
+    status: str = "active"
+    linked_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+# ---------------------------------------------------------------------------
+# Routes – status (existing)
+# ---------------------------------------------------------------------------
+
 @api_router.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -65,6 +107,74 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+
+# ---------------------------------------------------------------------------
+# Routes – payments
+# ---------------------------------------------------------------------------
+
+@api_router.post("/payment/initiate", response_model=PaymentSession)
+async def initiate_payment(input: PaymentInitiate):
+    if input.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than zero.")
+
+    session = PaymentSession(**input.model_dump())
+    doc = session.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+
+    await db.payment_sessions.insert_one(doc)
+    return session
+
+
+@api_router.get("/payment/{session_id}", response_model=PaymentSession)
+async def get_payment_session(session_id: str):
+    doc = await db.payment_sessions.find_one({"session_id": session_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Payment session not found.")
+
+    if isinstance(doc.get('created_at'), str):
+        doc['created_at'] = datetime.fromisoformat(doc['created_at'])
+
+    return PaymentSession(**doc)
+
+
+# ---------------------------------------------------------------------------
+# Routes – device registration
+# ---------------------------------------------------------------------------
+
+@api_router.post("/device/register", response_model=DeviceRecord)
+async def register_device(input: DeviceRegister):
+    if not input.device_id or len(input.device_id) < 8:
+        raise HTTPException(status_code=400, detail="Invalid device_id: must be at least 8 characters.")
+
+    # Upsert: update if exists, insert otherwise
+    record = DeviceRecord(**input.model_dump())
+    doc = record.model_dump()
+    doc['linked_at'] = doc['linked_at'].isoformat()
+
+    await db.devices.update_one(
+        {"device_id": input.device_id},
+        {"$set": doc},
+        upsert=True,
+    )
+    return record
+
+
+@api_router.get("/device/{device_id}", response_model=DeviceRecord)
+async def get_device(device_id: str):
+    doc = await db.devices.find_one({"device_id": device_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Device not found.")
+
+    if isinstance(doc.get('linked_at'), str):
+        doc['linked_at'] = datetime.fromisoformat(doc['linked_at'])
+
+    return DeviceRecord(**doc)
+
+
+# ---------------------------------------------------------------------------
+# App setup
+# ---------------------------------------------------------------------------
 
 # Include the router in the main app
 app.include_router(api_router)
