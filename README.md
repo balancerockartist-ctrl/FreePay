@@ -43,7 +43,19 @@ FreePay/
 
 ## Quick start
 
-### Backend
+### Docker Compose (recommended)
+
+```bash
+cp backend/.env.example backend/.env   # only DB_NAME is required; MONGO_URL and CORS_ORIGINS are set by docker-compose
+docker compose up --build
+```
+
+- API: `http://localhost:8000/api`
+- Dashboard: `http://localhost:3000`
+
+### Manual setup
+
+#### Backend
 
 ```bash
 cd backend
@@ -55,7 +67,7 @@ uvicorn server:app --reload
 
 The API will be available at `http://localhost:8000/api`.
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
