@@ -94,7 +94,7 @@ const Home = () => {
     setScannedItem({ ...item, hash });
     setCameraStatus({ type: "success", msg: `Scanned: ${item.name}` });
     startMembershipTimer();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [startMembershipTimer]);
 
   // ── Add tip ───────────────────────────────────────────────────────────────────
   const addTip = () => {
@@ -133,7 +133,7 @@ const Home = () => {
   };
 
   // ── Membership timer ──────────────────────────────────────────────────────────
-  const startMembershipTimer = () => {
+  const startMembershipTimer = useCallback(() => {
     if (membershipTimerRef.current) clearInterval(membershipTimerRef.current);
     setMembershipSecondsLeft(MEMBERSHIP_DURATION);
     membershipTimerRef.current = setInterval(() => {
@@ -145,7 +145,7 @@ const Home = () => {
         return prev - 1;
       });
     }, 1000);
-  };
+  }, []);
 
   useEffect(() => () => clearInterval(membershipTimerRef.current), []);
 
@@ -167,7 +167,7 @@ const Home = () => {
   const poolPct = Math.round((poolAmount / DAILY_CAPACITY) * 100);
   const releaseEnabled = !!scannedItem && poolAmount > 0;
   const membershipPct =
-    membershipSecondsLeft != null
+    membershipSecondsLeft !== null
       ? Math.round((membershipSecondsLeft / MEMBERSHIP_DURATION) * 100)
       : 0;
 
@@ -399,7 +399,7 @@ const Home = () => {
           <div className="card">
             <h2>🎖️ Lifetime Membership</h2>
             <div id="membershipStatus">
-              {membershipSecondsLeft != null ? (
+              {membershipSecondsLeft !== null ? (
                 <div style={{ textAlign: "center", padding: "8px 0" }}>
                   <div
                     style={{
