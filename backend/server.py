@@ -170,18 +170,19 @@ async def dual_c_verify(req: VerifyRequest):
         verified_at=datetime.now(timezone.utc),
     )
 
+_DAILY_CAPACITY = 5000.0
+_TIPS_PERCENTAGE = 0.02  # 2% of settled volume credited as incoming tips
+
 @api_router.get("/pool", response_model=PoolStatus)
 async def get_pool():
-    count = await db.transactions.count_documents({"status": "settled"})
     total = 0.0
     async for tx in db.transactions.find({"status": "settled"}, {"_id": 0, "amount": 1}):
         total += tx.get("amount", 0.0)
-    daily_capacity = 5000.0
     return PoolStatus(
-        available_balance=round(max(0.0, daily_capacity - total), 2),
-        daily_capacity=daily_capacity,
-        capacity_used_pct=round(min(100.0, (total / daily_capacity) * 100), 1),
-        incoming_tips_24h=round(total * 0.02, 2),
+        available_balance=round(max(0.0, _DAILY_CAPACITY - total), 2),
+        daily_capacity=_DAILY_CAPACITY,
+        capacity_used_pct=round(min(100.0, (total / _DAILY_CAPACITY) * 100), 1),
+        incoming_tips_24h=round(total * _TIPS_PERCENTAGE, 2),
     )
 
 @api_router.get("/transactions", response_model=List[Transaction])
