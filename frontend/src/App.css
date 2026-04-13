@@ -1,34 +1,406 @@
-.App-logo {
-    height: 40vmin;
+/* ── Claudia AI Brand Styles ─────────────────────────────────────── */
+
+/* Google Fonts – closest open-source approximation of the brand typefaces */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;900&family=Nunito:wght@400;600&display=swap');
+
+/* Brand token overrides */
+:root {
+    --brand-red:     #D65856;
+    --brand-orange:  #F97316;
+    --brand-yellow:  #FBBF24;
+    --brand-green:   #22C55E;
+    --brand-blue:    #3B82F6;
+    --brand-purple:  #8B5CF6;
+    --brand-navy:    #234880;
+    --brand-brown:   #634550;
+    --brand-lavender:#E5DEFE;
+    --brand-charcoal:#444444;
+    --brand-white:   #FFFFFF;
+
+    --gradient-rainbow: linear-gradient(
+        90deg,
+        var(--brand-red),
+        var(--brand-orange),
+        var(--brand-yellow),
+        var(--brand-green),
+        var(--brand-blue),
+        var(--brand-purple)
+    );
+}
+
+/* ── Global reset ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+.claudia-root {
+    font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--brand-charcoal);
+    background: #fff;
+    overflow-x: hidden;
+}
+
+/* ── Gradient text ───────────────────────────────────────────────── */
+.gradient-text {
+    background: var(--gradient-rainbow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── Navigation ──────────────────────────────────────────────────── */
+.claudia-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--brand-lavender);
+}
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+.nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.nav-brand-name {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--brand-charcoal);
+    font-family: 'Nunito Sans', sans-serif;
+}
+.nav-brand-sub {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--brand-navy);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+.nav-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--brand-charcoal);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.nav-link:hover { color: var(--brand-blue); }
+.nav-cta-btn {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    background: var(--gradient-rainbow);
+    color: #fff;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 2px 12px rgba(139,92,246,0.25);
+}
+.nav-cta-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.claudia-hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 5rem;
+    overflow: hidden;
+    background: linear-gradient(160deg, #fafafe 0%, #f0f4ff 60%, #fdf4ff 100%);
+}
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+}
+.hero-logo-wrap {
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    filter: drop-shadow(0 8px 32px rgba(139,92,246,0.18));
+}
+.hero-headline {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    margin: 0 0 0.25rem;
+    line-height: 1;
+}
+.hero-sub {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-navy);
+    margin: 0 0 1.5rem;
+}
+.hero-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 2.5rem;
+}
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Background orbs */
+.hero-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
     pointer-events: none;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.orb1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #8B5CF6, #3B82F6);
+    top: -100px; left: -150px;
+}
+.orb2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #F97316, #FBBF24);
+    bottom: -80px; right: -100px;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn-primary {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    background: var(--gradient-rainbow);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(139,92,246,0.3);
+    transition: opacity 0.2s, transform 0.2s;
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+.btn-primary.btn-large { padding: 1rem 2.5rem; font-size: 1.05rem; }
+
+.btn-secondary {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                var(--gradient-rainbow) border-box;
+    color: var(--brand-charcoal);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.btn-secondary:hover { background-color: var(--brand-lavender); transform: translateY(-2px); }
+
+/* ── Shared section styles ───────────────────────────────────────── */
+.section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+}
+.section-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 900;
+    margin: 0 0 0.75rem;
+    text-align: center;
+}
+.section-title.light { color: #fff; }
+.section-sub {
+    text-align: center;
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 3rem;
+}
+.section-sub.light { color: rgba(255,255,255,0.8); }
+
+/* ── Features ────────────────────────────────────────────────────── */
+.claudia-features { background: #fff; }
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+.feature-card {
+    background: #fafafe;
+    border: 1px solid var(--brand-lavender);
+    border-radius: 1rem;
+    padding: 2rem 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(139,92,246,0.12);
+}
+.feature-icon { margin-bottom: 1rem; }
+.feature-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--brand-charcoal);
+}
+.feature-desc { font-size: 0.9rem; color: #666; line-height: 1.6; margin: 0; }
+
+/* ── Solutions ───────────────────────────────────────────────────── */
+.claudia-solutions {
+    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-charcoal) 100%);
+}
+.solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+.solution-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 1.25rem;
+    padding: 2.5rem 2rem;
+    color: #fff;
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s, background 0.2s;
+}
+.solution-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.14); }
+.solution-card-dark {
+    background: rgba(0,0,0,0.2);
+}
+.solution-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.solution-logo span {
+    font-size: 1.2rem;
+    font-weight: 900;
+    font-family: 'Nunito Sans', sans-serif;
+}
+.solution-card p { font-size: 0.95rem; line-height: 1.65; color: rgba(255,255,255,0.75); margin: 0 0 1.5rem; }
+.solution-link {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--brand-yellow);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.solution-link:hover { color: var(--brand-orange); }
+
+/* ── About ───────────────────────────────────────────────────────── */
+.claudia-about { background: #fafafe; }
+.about-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: center;
+}
+.about-text h2 { text-align: left; }
+.about-text p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #555;
+    margin-bottom: 1.25rem;
+}
+.about-palette h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.75rem;
+}
+.palette-row { display: flex; gap: 0.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.palette-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+    cursor: default;
+}
+.palette-swatch:hover { transform: scale(1.15); }
+.neutral-swatch { border: 2px solid #ddd; }
+
+/* ── CTA ─────────────────────────────────────────────────────────── */
+.claudia-cta {
+    background: linear-gradient(160deg, #fdf4ff 0%, #f0f4ff 100%);
+    text-align: center;
+}
+.cta-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+    gap: 1rem;
+}
+.cta-headline {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    margin: 0;
+}
+.cta-sub {
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 0.5rem;
 }
 
-.App-link {
-    color: #61dafb;
+/* ── Footer ──────────────────────────────────────────────────────── */
+.claudia-footer {
+    background: var(--brand-charcoal);
+    color: rgba(255,255,255,0.7);
 }
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.footer-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+.footer-tagline {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+}
+.footer-copy { font-size: 0.82rem; }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .about-inner { grid-template-columns: 1fr; }
+    .about-text h2 { text-align: center; }
+    .about-palette { display: flex; flex-direction: column; align-items: center; }
 }

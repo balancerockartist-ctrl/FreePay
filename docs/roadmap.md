@@ -29,8 +29,8 @@
 - [ ] `Transaction` model and CRUD routes
 - [ ] `Account` model with running balance calculation
 - [ ] Basic dashboard — transaction list and account balance card
-- [ ] `.env.example` with documented variables
-- [ ] Docker Compose for local development
+- [x] `.env.example` with documented variables
+- [x] Docker Compose for local development
 
 ### Stretch goals
 
