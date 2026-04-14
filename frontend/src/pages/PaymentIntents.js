@@ -7,14 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PaymentIntents() {
   const [items, setItems] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/payment-intents").then(({ data }) => setItems(data));
+    api.get("/payment-intents").then(({ data }) => setItems(data)).catch(() => setError("Failed to load payment intents"));
   }, []);
 
   return (
     <Layout>
       <h1 className="text-2xl font-bold mb-6">Payment Intents</h1>
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
       <Card>
         <CardHeader>
           <CardTitle>All Payment Intents</CardTitle>

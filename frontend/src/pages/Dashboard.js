@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
+  const [errors, setErrors] = useState({});
   const PAGE_SIZE = 20;
 
   // ── Fetch accounts ────────────────────────────────────────────────────────
@@ -32,20 +33,22 @@ export default function Dashboard() {
     api.get("/accounts").then(({ data }) => {
       setAccounts(data);
       if (data.length > 0) setSelectedAccount(data[0].id);
-    });
+    }).catch(() => setErrors((e) => ({ ...e, accounts: "Failed to load accounts" })));
   }, []);
 
   // ── Fetch balance for selected account ───────────────────────────────────
   useEffect(() => {
     if (!selectedAccount) return;
-    api.get(`/accounts/${selectedAccount}`).then(({ data }) => setBalance(data));
+    api.get(`/accounts/${selectedAccount}`).then(({ data }) => setBalance(data))
+      .catch(() => setErrors((e) => ({ ...e, balance: "Failed to load balance" })));
   }, [selectedAccount]);
 
   // ── Fetch transactions ────────────────────────────────────────────────────
   const loadTx = useCallback(() => {
     const params = { skip: page * PAGE_SIZE, limit: PAGE_SIZE };
     if (statusFilter) params.status = statusFilter;
-    api.get("/transactions", { params }).then(({ data }) => setTransactions(data));
+    api.get("/transactions", { params }).then(({ data }) => setTransactions(data))
+      .catch(() => setErrors((e) => ({ ...e, transactions: "Failed to load transactions" })));
   }, [page, statusFilter]);
 
   useEffect(() => {
@@ -79,6 +82,9 @@ export default function Dashboard() {
   return (
     <Layout>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      {Object.values(errors).map((msg, i) => (
+        <p key={i} className="mb-2 text-sm text-red-600">{msg}</p>
+      ))}
 
       {/* Balance card */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

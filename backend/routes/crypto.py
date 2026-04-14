@@ -5,6 +5,7 @@ then settles the linked local Transaction.
 """
 import logging
 import re
+from datetime import datetime
 import httpx
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -127,7 +128,6 @@ async def verify_transaction(
     doc["status"] = TransactionStatus.settled
     doc["external_ref"] = body.tx_hash
     doc["settled_at"] = now_iso
-    from datetime import datetime
     if isinstance(doc.get("created_at"), str):
         doc["created_at"] = datetime.fromisoformat(doc["created_at"])
     if isinstance(doc.get("settled_at"), str):

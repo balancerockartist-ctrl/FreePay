@@ -6,10 +6,9 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
-from jose import jwt
 
 from auth import get_current_user
-from config import db, JWT_SECRET, JWT_ALGORITHM
+from config import db
 from models import Transaction, TransactionCreate, TransactionStatus, User, UserRole, _now
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
