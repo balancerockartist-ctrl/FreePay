@@ -4,7 +4,7 @@
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | Off-chain ledger MVP | 🟡 In progress |
+| 1 | Off-chain ledger MVP | ✅ Complete |
 | 2 | Stripe integration | ⬜ Planned |
 | 3 | Crypto rails | ⬜ Planned |
 | 4 | Agent economy | ⬜ Planned |
@@ -23,14 +23,14 @@
 - [x] React 19 frontend scaffolded with Tailwind + shadcn/ui
 - [x] Repository documentation (README, vision, architecture, AI policy, roadmap)
 - [x] CI workflow for Markdown linting
-
-### In progress
-
-- [ ] `Transaction` model and CRUD routes
-- [ ] `Account` model with running balance calculation
-- [ ] Basic dashboard — transaction list and account balance card
-- [ ] `.env.example` with documented variables
-- [ ] Docker Compose for local development
+- [x] `Transaction` model and CRUD routes
+- [x] `Account` model with running balance calculation
+- [x] Basic dashboard — transaction list and account balance card
+- [x] `.env.example` with documented variables
+- [x] Docker Compose for local development
+- [x] `Dockerfile` for backend and frontend
+- [x] Google Cloud Run deployment configuration
+- [x] Google Cloud deployment documentation (`docs/deploy-gcp.md`)
 
 ### Stretch goals
 
@@ -78,3 +78,4 @@
 | Version | Date | Highlights |
 |---------|------|------------|
 | 0.1.0 | 2026-04-05 | Initial MVP scaffold — API, frontend, CI, documentation |
+| 0.2.0 | 2026-04-14 | Phase 1 complete — Transaction + Account models, dashboard, Docker, GCP deploy |

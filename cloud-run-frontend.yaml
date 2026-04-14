@@ -1,0 +1,23 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: freepay-frontend
+  # Replace PROJECT_ID and HASH with your Google Cloud project ID and image digest before applying
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "5"
+    spec:
+      containers:
+        - image: gcr.io/PROJECT_ID/freepay-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: REACT_APP_BACKEND_URL
+              value: https://freepay-backend-HASH-uc.a.run.app
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "1"
