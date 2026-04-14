@@ -1,0 +1,70 @@
+import { useEffect, useState } from "react";
+import { format, parseISO } from "date-fns";
+import api from "@/lib/api";
+import Layout from "@/components/Layout";
+import StatusBadge from "@/components/StatusBadge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export default function PaymentIntents() {
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    api.get("/payment-intents").then(({ data }) => setItems(data));
+  }, []);
+
+  return (
+    <Layout>
+      <h1 className="text-2xl font-bold mb-6">Payment Intents</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>All Payment Intents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-gray-500">
+                  <th className="text-left py-2 pr-4">ID</th>
+                  <th className="text-left py-2 pr-4">Account</th>
+                  <th className="text-right py-2 pr-4">Amount</th>
+                  <th className="text-left py-2 pr-4">Currency</th>
+                  <th className="text-left py-2 pr-4">Status</th>
+                  <th className="text-left py-2 pr-4">Stripe PI</th>
+                  <th className="text-left py-2">Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((pi) => (
+                  <tr key={pi.id} className="border-b hover:bg-gray-50">
+                    <td className="py-2 pr-4 font-mono text-xs text-gray-400">
+                      {pi.id.slice(0, 8)}…
+                    </td>
+                    <td className="py-2 pr-4 truncate max-w-[120px]">{pi.account_id}</td>
+                    <td className="py-2 pr-4 text-right font-mono">{pi.amount.toFixed(2)}</td>
+                    <td className="py-2 pr-4">{pi.currency}</td>
+                    <td className="py-2 pr-4">
+                      <StatusBadge status={pi.status} />
+                    </td>
+                    <td className="py-2 pr-4 font-mono text-xs text-gray-400 truncate max-w-[140px]">
+                      {pi.stripe_pi_id || "—"}
+                    </td>
+                    <td className="py-2 text-gray-400 text-xs">
+                      {pi.created_at ? format(parseISO(pi.created_at), "MM/dd HH:mm") : "—"}
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-gray-400">
+                      No payment intents yet
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </Layout>
+  );
+}
