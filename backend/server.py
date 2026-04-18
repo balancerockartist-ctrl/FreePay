@@ -176,9 +176,10 @@ async def list_transactions(account_id: Optional[str] = None):
     return _deserialize_transactions(docs)
 
 # Recent transactions feed (must be defined before /{transaction_id} to avoid routing conflict)
+# Returns the last 20 camera payment transactions (identified by the presence of tx_hash and timestamp)
 @api_router.get("/transactions/feed")
 async def get_transaction_feed():
-    txs = await db.transactions.find({}, {"_id": 0}).sort("timestamp", -1).to_list(20)
+    txs = await db.transactions.find({"tx_hash": {"$exists": True}}, {"_id": 0}).sort("timestamp", -1).to_list(20)
     return txs
 
 @api_router.get("/transactions/{transaction_id}", response_model=Transaction)
@@ -394,6 +395,9 @@ async def process_camera_payment(payload: CameraPaymentRequest):
         "status": "confirmed",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+    # Camera payment transactions have a different schema (tx_hash, item_label, network, etc.)
+    # than account-based CRUD transactions, so they are stored directly rather than
+    # through the create_transaction endpoint which requires a valid account_id.
     doc = dict(transaction)
     await db.transactions.insert_one(doc)
     return transaction
