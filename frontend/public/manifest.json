@@ -1,0 +1,17 @@
+{
+  "short_name": "FreePay",
+  "name": "FreePay – Camera Solana Pay",
+  "description": "Scan items with your camera and pay instantly with Solana.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}
