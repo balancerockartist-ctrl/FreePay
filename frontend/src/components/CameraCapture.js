@@ -66,7 +66,10 @@ export function CameraCapture({ onCapture, isProcessing }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Simulate Dual C item detection scan
+  // Simulate Dual C item detection scan.
+  // NOTE: This is a placeholder implementation that randomly selects a category label.
+  // Full integration requires a real-time on-device AI model (e.g. YOLOv8/custom TFLite)
+  // that processes video frames from the camera feed to identify items and their prices.
   const runScan = useCallback(() => {
     setScanning(true);
     setDetectedItem(null);

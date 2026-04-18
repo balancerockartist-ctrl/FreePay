@@ -45,7 +45,9 @@ export function useSolanaPayment() {
 
   /**
    * Process a camera payment:
-   *   1. Get latest Solana blockhash (for transaction validity window)
+   *   1. Anchor the transaction to the current Solana slot via the latest blockhash
+   *      (provides a validity window reference — required for signed transactions once
+   *       the SOLULM on-chain program is deployed)
    *   2. POST to backend /api/camera/payment (generates tx hash + applies 7G logic)
    *   3. Return the transaction record
    */

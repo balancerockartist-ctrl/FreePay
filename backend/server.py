@@ -181,11 +181,16 @@ async def get_membership_status(wallet_address: Optional[str] = None):
 # Camera payment trigger: Dual C visual logic
 @api_router.post("/camera/payment")
 async def process_camera_payment(payload: CameraPaymentRequest):
-    tx_hash = "Sol" + "".join(random.choices(string.ascii_letters + string.digits, k=43))
+    # NOTE: This generates a simulated transaction hash in the format used by the
+    # Solana network. Full on-chain execution requires a deployed SOLULM program
+    # and funded protocol reserve account. This PoC demonstrates the closed-loop
+    # economics logic (25% consumer discount / 100% retailer settlement) and
+    # produces a placeholder tx_hash in the expected Solana base-58 format.
+    simulated_tx_hash = "Sol" + "".join(random.choices(string.ascii_letters + string.digits, k=43))
     savings_data = await calculate_savings(payload.amount)
     transaction = {
         "id": str(uuid.uuid4()),
-        "tx_hash": tx_hash,
+        "tx_hash": simulated_tx_hash,
         "item_label": payload.item_label,
         "wallet_address": payload.wallet_address,
         "original_amount": savings_data["original_amount"],

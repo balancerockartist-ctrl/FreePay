@@ -36,7 +36,11 @@ self.addEventListener("fetch", (event) => {
 
   // API requests: always try network first, no caching
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(fetch(request).catch(() => new Response(JSON.stringify({ error: "offline" }), { headers: { "Content-Type": "application/json" } })));
+    const offlineResponse = new Response(
+      JSON.stringify({ error: "offline" }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+    event.respondWith(fetch(request).catch(() => offlineResponse));
     return;
   }
 
