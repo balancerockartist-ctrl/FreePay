@@ -155,8 +155,8 @@ async def calculate_savings(amount: float, discount_rate: float = 0.10, tip_rate
     """
     Calculate the payment split for a given transaction amount.
 
-    - discount_rate: fraction of the total offered as an instant discount (default 10 %).
-    - tip_rate: fraction of the remaining amount suggested as a voluntary tip (default 90 %).
+    - discount_rate: fraction of the total offered as an instant discount (default 10%).
+    - tip_rate: fraction of the remaining amount suggested as a voluntary tip (default 90%).
     """
     if amount <= 0:
         raise HTTPException(status_code=422, detail="amount must be positive")

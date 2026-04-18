@@ -27,7 +27,7 @@ function classifyFrame(canvas) {
     sum += (data[i] + data[i + 1] + data[i + 2]) / 3;
   }
   const avg = sum / (data.length / 4);
-  const index = Math.floor((avg / 256) * ITEM_CATEGORIES.length) % ITEM_CATEGORIES.length;
+  const index = Math.floor((avg / 255) * ITEM_CATEGORIES.length) % ITEM_CATEGORIES.length;
   return ITEM_CATEGORIES[index];
 }
 

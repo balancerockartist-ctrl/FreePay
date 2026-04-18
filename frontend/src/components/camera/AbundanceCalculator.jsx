@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-const DEFAULT_DISCOUNT_RATE = 0.10; // 10 % instant discount
-const DEFAULT_TIP_RATE = 0.90;      // 90 % voluntary tip suggestion
+const DEFAULT_DISCOUNT_RATE = 0.10; // 10% instant discount
+const DEFAULT_TIP_RATE = 0.90;      // 90% voluntary tip suggestion
 
 /**
  * AbundanceCalculator
@@ -75,7 +75,7 @@ export default function AbundanceCalculator({
               <span className="flex items-center gap-1">
                 Instant Discount
                 <Badge variant="secondary" className="text-xs ml-1">
-                  {Math.round(discountRate * 100)} %
+                  {Math.round(discountRate * 100)}%
                 </Badge>
               </span>
             }
@@ -94,7 +94,7 @@ export default function AbundanceCalculator({
             className="w-full"
           />
           <p className="text-xs text-muted-foreground">
-            Drag to adjust the discount rate (0 – 50 %)
+            Drag to adjust the discount rate (0–50%)
           </p>
         </div>
 
@@ -119,7 +119,7 @@ export default function AbundanceCalculator({
               <span className="flex items-center gap-1">
                 Voluntary Tip Suggestion
                 <Badge variant="secondary" className="text-xs ml-1">
-                  {Math.round(tipRate * 100)} %
+                  {Math.round(tipRate * 100)}%
                 </Badge>
               </span>
             }
@@ -136,7 +136,7 @@ export default function AbundanceCalculator({
             className="w-full"
           />
           <p className="text-xs text-muted-foreground">
-            This tip is entirely voluntary — drag to adjust (0 – 100 %)
+            This tip is entirely voluntary — drag to adjust (0–100%)
           </p>
         </div>
 

@@ -164,7 +164,7 @@ function CalculatorPage() {
     <div className="flex flex-col items-center gap-6 py-6 px-4 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold">Abundance Calculator</h1>
       <p className="text-sm text-muted-foreground text-center">
-        See how the 10 % instant discount and voluntary tip are applied to any amount.
+        See how the 10% instant discount and voluntary tip are applied to any amount.
       </p>
 
       <div className="flex items-center gap-3 w-full max-w-md">
