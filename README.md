@@ -1,4 +1,4 @@
-Here is the fully updated Universal License Agreement, completely recalibrated to integrate the 90/10 voluntary tip structure, the 0.5% royalty, and the $200,000 discovery retainer.
+Build a full stack web 3 app called FreePay based on my project in this document 
 THE END OF EXCHANGE: UNIVERSAL INTELLECTUAL PROPERTY & OPERATIONAL LICENSE AGREEMENT
 EFFECTIVE DATE: [INSERT DATE OF SENDING]
 PROVENANCE DATE: Conceived and Established 2020
