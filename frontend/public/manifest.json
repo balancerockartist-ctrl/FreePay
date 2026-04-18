@@ -1,0 +1,19 @@
+{
+  "short_name": "FreePay",
+  "name": "FreePay – Camera Payment",
+  "description": "Scan an item with your camera and pay instantly.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0f0f10",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "utilities"],
+  "screenshots": []
+}
