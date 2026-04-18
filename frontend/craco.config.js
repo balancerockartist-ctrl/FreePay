@@ -1,5 +1,6 @@
 // craco.config.js
 const path = require("path");
+const webpack = require("webpack");
 require("dotenv").config();
 
 // Check if we're in development/preview mode (not production build)
@@ -38,8 +39,38 @@ let webpackConfig = {
     },
     configure: (webpackConfig) => {
 
+      // Node.js polyfills required by @solana/web3.js in a browser/webpack-5 context
+      webpackConfig.resolve = {
+        ...webpackConfig.resolve,
+        alias: {
+          ...webpackConfig.resolve?.alias,
+          // Explicitly resolve 'process/browser' to its .js file so strict-ESM
+          // modules (like react-router v7) don't get a "fully specified" error.
+          "process/browser": require.resolve("process/browser.js"),
+        },
+        fallback: {
+          ...webpackConfig.resolve?.fallback,
+          crypto: require.resolve("crypto-browserify"),
+          stream: require.resolve("stream-browserify"),
+          buffer: require.resolve("buffer"),
+          process: require.resolve("process/browser.js"),
+          vm: false,
+          fs: false,
+          path: false,
+        },
+      };
+
+      // Provide Buffer and process globals (needed by @solana/web3.js)
+      webpackConfig.plugins = [
+        ...webpackConfig.plugins,
+        new webpack.ProvidePlugin({
+          Buffer: ["buffer", "Buffer"],
+          process: ["process/browser.js"],
+        }),
+      ];
+
       // Add ignored patterns to reduce watched directories
-        webpackConfig.watchOptions = {
+      webpackConfig.watchOptions = {
           ...webpackConfig.watchOptions,
           ignored: [
             '**/node_modules/**',
