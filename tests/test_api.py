@@ -21,9 +21,6 @@ class _FakeCollection:
     async def insert_one(self, doc):
         return None
 
-    async def find(self, *args, **kwargs):
-        return _FakeCursor()
-
     def find(self, *args, **kwargs):
         return _FakeCursor()
 
