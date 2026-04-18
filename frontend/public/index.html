@@ -3,8 +3,9 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="A product of emergent.sh" />
+        <meta name="theme-color" content="#7c3aed" />
+        <meta name="description" content="Free Pay ♾️ — 7G Camera Consciousness payment network on SOLANA. 25% abundance discount, 100% retailer settlement." />
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
@@ -21,7 +22,7 @@
         work correctly both with client-side routing and a non-root public URL.
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
-        <title>Emergent | Fullstack App</title>
+        <title>Free Pay ♾️ — Camera Consciousness</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
     </head>
@@ -153,6 +154,16 @@
                     capturePerformance: false,
                 },
             });
+        </script>
+        <script>
+            // Register the Free Pay service worker for PWA installability
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('%PUBLIC_URL%/sw.js').catch(function (err) {
+                        console.warn('Service worker registration failed:', err);
+                    });
+                });
+            }
         </script>
     </body>
 </html>
