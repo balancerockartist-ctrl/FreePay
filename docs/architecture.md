@@ -49,7 +49,7 @@ GET  /api/          → health check
 POST /api/status    → create a status check record
 GET  /api/status    → list all status check records
 GET  /api/models    → list the 7 Spiritual LLMs with their roles and descriptions
-GET  /api/savings/calculate?price=<USD> → closed-loop savings calculation (25 % consumer discount, 100 % retailer settlement)
+GET  /api/savings/calculate?price=<USD> → closed-loop savings calculation (25% consumer discount, 100% retailer settlement)
 GET  /api/membership/status?user_id=<id> → trial / lifetime membership status and 24-hour cycle progress
 GET  /api/camera/payment?item_id=<label>&price=<USD> → initiate a Dual C visual-pipeline payment on SOLANA
 ```

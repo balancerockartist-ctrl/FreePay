@@ -133,8 +133,8 @@ async def get_models():
 # Savings — GET /api/savings/calculate
 # ---------------------------------------------------------------------------
 
-CONSUMER_DISCOUNT_RATE = 0.25  # 25 % discount applied to the consumer
-RETAILER_SETTLEMENT_RATE = 1.00  # Retailer always receives 100 %
+CONSUMER_DISCOUNT_RATE = 0.25  # 25% discount applied to the consumer
+RETAILER_SETTLEMENT_RATE = 1.00  # Retailer always receives 100%
 
 
 class SavingsResult(BaseModel):
@@ -225,6 +225,8 @@ async def get_membership_status(
         joined_at = datetime.fromisoformat(joined_at_raw)
     else:
         joined_at = joined_at_raw
+        if joined_at is not None and joined_at.tzinfo is None:
+            joined_at = joined_at.replace(tzinfo=timezone.utc)
 
     hours_active = (datetime.now(timezone.utc) - joined_at).total_seconds() / 3600
     cycle_complete = hours_active >= ACTIVATION_WINDOW_HOURS
